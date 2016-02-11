@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="bootstrap/css/bootstrap-theme.min.css">
+
+	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+
+	<!-- Video in Tooltip -->
+	<script src="JQVideoLightning/js/scale.fix.js"></script>
+	<script src="JQVideoLightning/js/jquery.min.js"></script>
+	<script src="JQVideoLightning/js/videoLightning.js"></script>
+	<script src="JQVideoLightning/js/jqvl-page.js"></script>
+	
+
+	<script src="http://vjs.zencdn.net/4.12/video.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.23/angular.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+  	<script src="js/jquery-ui-1.11.4/jquery-ui.js"></script> 
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+
+    <script src="js/copyJson.js"></script>
+
+</head>
+<body>
+
+<div class="well">
+
+<!-- HEAD: Navigation Tabs ---->
+<ul class="nav nav-tabs">
+  <li role="presentation"><a href="#">Home</a></li>
+  <li role="presentation" class="active"><a href="#">CCTV</a></li>
+  <li role="presentation"><a href="#">Messages</a></li>
+</ul>
+<br>
+
+<!-- BODY: CCTV ---->
+
+<!-- BODY: Left Menu ---->
+<div class="col-xs-1 col-sm-0 col-md-0 col-lg-0">
+					<div><img id="menuInfo" class="menuIcon" src="Img/icon-information-circled.png" alt="Information"></div>
+					<div><img id="menuAlarm" class="menuIcon" src="Img/first_aid_bg.png" alt="Emergency"></div>
+
+			        <div><img id="menuMark" class="menuIcon" src="Img/Bookmark_2.png" alt="Markieren"></div>
+
+			        <div><img id="menuPlaylist" class="menuIcon" src="Img/restore_window.png" alt="Playlist"></div>
+
+			        <div style="height:50px;width=50px;margin-top: 15%;"></div>
+</div>
+
+<!-- BODY: Playlist ---->
+<div class="row">
+<div id="playlist">
+	    <div ng-app="playlistController" ng-controller="playlistController" class="col-xs-5 col-sm-3 col-md-3 col-lg-3">
+
+	<div class="row">
+	    	<button type="button" id="btn_viewAll" class="btn btn-primary full" ng-click="viewAll()">All</button>
+	    	<button type="button" id="btn_viewMark" class="btn btn-primary full" ng-click="viewMark()">Marked</button>
+	    	<button type="button" id="btn_viewMark" class="btn btn-primary full" ng-click="viewMark()">Alarms</button>
+	</div>
+	<br>
+		<div class="row">
+
+					<div class="form-group">
+						<label>Filter by Car</label>
+			            <select class="form-control" ng-model="selectedCategory" ng-options="x.car for x in carArray">
+			            	<option value="">-- Select a car --</option>
+			            </ul>
+			            </select>
+					</div>
+
+					<div class="form-group">
+						<label>Filter by Camera</label>
+			            <select class="form-control" ng-model="selectedSubCategory" ng-options="y.camera for y in selectedSubCategoryValues">
+			            	<option value="">-- Select a camera --</option>
+			            </ul>
+			            </select>
+					</div>
+	            
+
+		</div>
+			        <hr/>
+			        <!-- Amount of results
+			        <li>
+			            <div class="alert alert-info">
+			                 <h4>Total Videos: {{filtered.length}}</h4>
+			            </div>
+			        </li>
+
+			    -->
+		<div class="row scrollable-content">	
+	    	<div ng-repeat="x in parseData" class="scrollable-content" >
+				<div>Car {{x.car}}</div>
+	    		<ul class="list-group">
+	    			<div ng-repeat="y in x.records | orderBy:'timestamp'" >
+	    				<li class="list-group-item">
+	    					<div>
+	    						<div class="row">
+	    							<div class="col-xs-10 col-sm-9 col-md-9 col-lg-9">
+	    						<p>Camera {{y.camera}}</p>
+		    						<!-- <video ng-src="{{y.video}}" width="100px" height="100px">Video</video> -->
+		    						<a ng-href="Videos/{{y.video}}">Timestamp: {{y.timestamp}}</a>
+		    						<p>Timestamp {{y.timestamp}}</p>
+		    						</div>
+
+		    						<div>
+			    						<p>
+				    						<button type="button" id="videoCom{{y.id}}"><img class="videoComment" src="Img/comment.png" data-toggle="modal" data-target="#videoCommentModal{{y.id}}"></img>
+				    						</button>
+
+				    						<label for="videoFav{{y.id}}">
+				    							<img class="videoFavorite" src="Img/Bookmark_2.png" data-checked='Img/favorite.png' data-unchecked='Img/Bookmark_2.png' alt=""></img>
+				    						</label><input type="checkbox" ng-model="y.mark" ng-click="addMark()" id="videoFav{{y.id}}">
+				    					</p>
+			    					</div>
+
+	    							</div>
+	    							<!-- Modal -->
+										  <div class="modal fade" id="videoCommentModal{{y.id}}" role="dialog">
+										    <div class="modal-dialog">
+										    
+										      <!-- Modal content-->
+										      <div class="modal-content">
+
+										      <!-- Modal Header -->
+										        <div class="modal-header">
+										          <button type="button" class="close" data-dismiss="modal">&times;</button>
+										          <h4 class="modal-title">Video Comments</h4>
+										        </div>
+
+										        <!-- Modal Body -->
+										        <div class="modal-body">
+										          <form role="form">
+										          	<div class="form-group">
+										          		<!-- <label for="exampleInputEmail1"></label> -->
+										                      <textarea class="form-control" id="videoComment{{y.id}}" placeholder="In this video . . ." rows="5" ng-model="y.comment">{{y.comment}}</textarea>
+										          	</div>
+										          </form>
+										        </div>
+
+										        <!-- Modal Footer -->
+										        <div class="modal-footer">
+										          <button type="button" id="btn_closeComment{{y.id}}" class="btn btn-default" data-dismiss="modal">Close</button>
+										          <button type="button" id="btn_saveComment{{y.id}}" class="btn btn-primary" ng-click="addComment()">Save changes</button>
+										        </div>
+										      </div>
+										      
+										    </div>
+										  </div>
+									<!-- Modal End -->
+			    			</div>
+			    		</li>
+			    	</div>
+				</ul>
+
+			</div>
+		</div>
+
+
+			<div if="results">Results</div>
+		</div>
+	</div>
+</div>
+
+
+</div>
+
+<!-- FOOTER: Topology ---->
+<div class="container-fluid">
+	<div class="col-xs-2 col-sm-1 col-md-1 col-lg-1">
+		<div><img class="menuIcon" src="Img/home_house_nav_navigation_menu.png" alt="Home"></div>
+	</div>
+	<div class="col-xs-8 col-sm-10 col-md-10 col-lg-10">
+		<div><img class="menuIcon" src="Img/shutdown.png" alt="Home"></div>
+	</div>	
+	<div class="col-xs-2 col-sm-1 col-md-1 col-lg-1">
+		<div><img class="menuIcon" src="Img/shutdown.png" alt="Home"></div>
+	</div>
+</div>
+
+</body>
+<script src="js/video.js"></script>
+</html>
+
+<script>
+
+var app=angular.module('playlistController',[]);
+
+app.controller('playlistController', function($scope){
+		$scope.data = json;
+		$scope.parseData = $scope.data.tags;
+		
+		//Create arrays for cars and cameras selects -- Options bind
+		var carArray = [];
+		var cameraArray = [];
+
+
+		for(var i=0, len=$scope.parseData.length; i<len;i++){
+			carArray.push({id: $scope.parseData[i].id, car: $scope.parseData[i].car});
+		}
+
+		$scope.categories = carArray;
+		$scope.subCategories = $scope.parseData;
+
+		$scope.selectedCategory = "";
+		$scope.selectedSubCategoryValues = [];			
+		$scope.selectedCamera = "";
+
+		$scope.$watch('selectedCategory', function(newValue){
+			for(var i=0; i<$scope.subCategories.length; i++){
+
+				if($scope.subCategories[i].car === newValue.car){
+					$scope.selectedSubCategoryValues = $scope.subCategories[i].records;
+
+				}
+			}
+		});	
+
+		$scope.carArray = carArray;
+
+		$scope.addComment = function(){
+			$scope.msg = JSON.stringify($scope.data);
+		};
+
+		$scope.addMark = function(){
+			$scope.msg = JSON.stringify($scope.data);
+		};
+
+		$scope.viewAll = function(){
+			//Print only playlist with marked videos
+			console.log($scope.parseData);
+
+		};
+
+		$scope.viewMark = function(){
+			//Print only playlist with marked videos
+
+			$scope.isMarked = function(d){
+				return d.data.catname.mark == true;
+			};
+
+		};
+
+
+		$scope.setSelectedCar = function(){
+			var id = this.parseData.id;
+			if(_.contains($scope.selectedCar, id)){
+				$scope.selectedCar = _.without($scope.selectedCar, id);
+			}else{
+				$scope.selectedCar.push(id);
+			}
+			return false;
+		};
+
+		$scope.isChecked = function(id){
+			if(_.contains($scope.selectedCar, id)){
+				return 'icon-ok pull-right';
+			}
+			return false;
+		}
+
+		$scope.checkAll = function(){
+			$scope.selectedCar = _.pluck($scope.parseData, 'id');
+		};
+		
+});
+
+
+</script>
+
+<style>
+.videoComment, .videoFavorite{
+	display: inline-block;
+	max-height: 30px;
+	max-width: 30px;
+}
+
+input[type=checkbox] {
+    display:none;
+  }
+
+.scrollable-menu {
+    height: auto;
+    max-height: 200px;
+    overflow-x: hidden;
+}
+
+.scrollable-content {
+    height: auto;
+    max-height: 620px;
+    overflow-x: hidden;
+}
+
+.menuIcon{
+	display: inline-block;
+	max-height: 50px;
+	max-width: 50px;
+	margin-top:20px;
+	margin-bottom:20px;
+}	
+
+
+</style>
